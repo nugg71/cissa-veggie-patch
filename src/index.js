@@ -4,9 +4,18 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import SignUp from './pages/SignUp'
+import {Browser, Route, Switch} from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom/cjs/react-router-dom.min';
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Switch>
+        <Route exact path ='/' component={SignUp}/>
+        <Route exact path='/signup' component={SignUp}/>
+      </Switch>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );
