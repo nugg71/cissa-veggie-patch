@@ -1,99 +1,174 @@
-import React, { useState } from "react";
-import { AppBar, Avatar, Grid, Paper, Toolbar, TextField, Button, Typography, Link } from '@material-ui/core';
-import {Redirect} from 'react-router-dom';
+import React, { useState } from 'react'
 import {
-    authFunctions
-} from '../firebase';
-
-const gridStyle = {
-    width: "100%",
-    margin: "0px"
-}
-
-const rightPaperStyle = {
-  width: "50vw",
-  backgroundColor: "green",
-};
-
-const leftPaperStyle = {
-  padding: "20px",
-  height: "50vh",
-  width: "280px",
-  margin: "20px auto",
-};
-
-const h3Style = {
-    color: "#FFFFFF",
-    padding: "20px"
-}
-
-const buttonStyle = {
-    margin: "10px 0"
-}
+  AppBar,
+  Avatar,
+  Grid,
+  Paper,
+  Toolbar,
+  TextField,
+  Button,
+  Typography,
+  Link,
+  InputLabel,
+  InputAdornment,
+  IconButton
+} from '@material-ui/core'
+import { Redirect } from 'react-router-dom'
+import { authFunctions } from '../firebase'
+import { Visibility, VisibilityOff } from '@material-ui/icons'
 
 const SignUp = () => {
-  const [state, setState] = useState({email: '', username: '', password: '', success: false, signup: false, uid: null})
+  const [state, setState] = useState({
+    email: '',
+    username: '',
+    password: '',
+    confirm: '',
+    showPassword: false,
+    success: false,
+    signup: false,
+    uid: null
+  })
 
   const handleChange = (event) => {
-      setState((currState) => ({...currState, [event.target.name]: event.target.value}));
+    setState((currState) => ({ ...currState, [event.target.name]: event.target.value }))
   }
 
   const handleSubmit = (event) => {
-      authFunctions.signUp(
-          state.username,
-          state.email,
-          state.password
-      );
+    if (state.password === state.confirm) {
+      authFunctions.signUp(state.username, state.email, state.password)
       authFunctions.onUserActive((uid) => {
-          setState((currState) => ({...currState, success: true, uid: uid}));
-      });
-      event.preventDefault();
+        setState((currState) => ({ ...currState, success: true, uid: uid }))
+      })
+      event.preventDefault()
+    }
+  }
+
+  const handleClickShowPassword = () => {
+    setState((currState) => ({ ...currState, showPassword: !currState.showPassword }))
+  }
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault()
   }
 
   const redirectToLogIn = () => {
-      setState((currState) => ({...currState, login: true}));
+    setState((currState) => ({ ...currState, login: true }))
   }
 
   if (state.login) {
-      return <Redirect to='./login'/>
+    return <Redirect to='./login' />
   }
   if (state.success) {
-      return <Redirect to="./home"/>
+    return <Redirect to='./home' />
   }
   return (
-      <div>
-          <Grid container style={gridStyle} spacing={2}>
-              <Grid item>
-                  <Paper style={leftPaperStyle} elevation={10}>
-                      <Grid align='center'>
-                          <Avatar></Avatar>
-                          <h2>Sign up</h2>
-                      </Grid>
-                      <form onSubmit={handleSubmit}>
-                          <TextField label="Username" placeholder="Username" name="username" id="username" fullWidth required autoFocus onChange={handleChange} value={state.username}/>
-                          <TextField label="Email" placeholder="Enter email" name="email" id="email" fullWidth required onChange={handleChange} value={state.email}/>
-                          <TextField label="Password" placeholder="Enter password" name="password" id="password" fullWidth required type="password" onChange={handleChange} value={state.password}/>
-                          <Button type="submit" color="primary" variant="contained" fullWidth style={buttonStyle}>Sign up</Button>
-                      </form>
-                      <Typography>
-                          Already have an account?{" "}<Link href="" onClick={redirectToLogIn}>Log in</Link>
-                      </Typography>
-                  </Paper>
+    <Grid container style={{ height: '100vh' }} spacing={2} justify='center' alignItems='center'>
+      {/* App Blurb */}
+      <Grid item container xs={12} md={5} justify='center' alignItems='center'></Grid>
+
+      {/* Form */}
+      <Grid item container xs={12} md={5} justify='center' alignItems='center'>
+        <Paper elevation={1} style={{ borderRadius: 15, width: '60%' }}>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item container>
+                <InputLabel>Username</InputLabel>
+                <TextField
+                  placeholder='enter your username'
+                  name='username'
+                  id='username'
+                  fullWidth
+                  required
+                  autoFocus
+                  onChange={handleChange}
+                  value={state.username}
+                />
               </Grid>
-              <Grid item>
-                  <Paper style={rightPaperStyle}>
-                      <div>
-                          <h3 style={h3Style}>
-                          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                          </h3>
-                          <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" alt="yellow flowers" width="60%"/>
-                      </div>
-                  </Paper>
+              <Grid item container>
+                <InputLabel>Email</InputLabel>
+                <TextField
+                  placeholder='enter your email'
+                  name='email'
+                  id='email'
+                  fullWidth
+                  required
+                  autoFocus
+                  onChange={handleChange}
+                  value={state.email}
+                />
               </Grid>
-          </Grid>
-      </div>
+              <Grid item container>
+                <InputLabel>Password</InputLabel>
+                <TextField
+                  placeholder='enter password'
+                  name='password'
+                  id='password'
+                  type={state.showPassword ? 'text' : 'password'}
+                  fullWidth
+                  required
+                  onChange={handleChange}
+                  value={state.password}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          aria-label='toggle password visibility'
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge='end'
+                        >
+                          {state.showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item container>
+                <InputLabel>Confirm Password</InputLabel>
+                <TextField
+                  placeholder='confirm your password'
+                  name='confirm'
+                  id='confirm'
+                  type={state.showPassword ? 'text' : 'password'}
+                  fullWidth
+                  required
+                  onChange={handleChange}
+                  value={state.confirm}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          aria-label='toggle password visibility'
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge='end'
+                        >
+                          {state.showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item container justify='center' alignItems='center'>
+                <Button type='submit' color='primary' variant='contained'>
+                  Sign up
+                </Button>
+              </Grid>
+              <Grid item container justify='center' alignItems='center'>
+                <Typography style={{ fontSize: '0.75rem' }}>
+                  <Link href='' onClick={redirectToLogIn}>
+                    Go back to login
+                  </Link>
+                </Typography>
+              </Grid>
+            </Grid>
+          </form>
+        </Paper>
+      </Grid>
+    </Grid>
   )
-  
 }
 
-export default SignUp;
+export default SignUp
