@@ -1,101 +1,99 @@
-import React from "react";
-import { AppBar, Avatar, Grid, Paper, TextField, Toolbar, Button, Typography } from '@material-ui/core'
-import {Redirect,Link} from 'react-router-dom'
+import React, { useState } from "react";
+import { AppBar, Avatar, Grid, Paper, Toolbar, TextField, Button, Typography, Link } from '@material-ui/core';
+import {Redirect} from 'react-router-dom';
+import {
+    authFunctions
+} from '../firebase';
 
 const gridStyle = {
-    width: "100%", 
-    margin: 0 // no spacing
-}
-
-const leftPaperStyle = {
-    width: "100%", 
-    backgroundColor: "#405185"
-}
-
-const h3Style = {
-    color: "#FFFFFF",
-    padding: "20px",
+    width: "100%",
+    margin: "0px"
 }
 
 const rightPaperStyle = {
-    width: "100%", 
-    padding: "25px",
-    height: "50vh", // 50% of current window size
-    width: "200px",
-    margin: "20px auto 20px"
+  width: "50vw",
+  backgroundColor: "green",
+};
+
+const leftPaperStyle = {
+  padding: "20px",
+  height: "50vh",
+  width: "280px",
+  margin: "20px auto",
+};
+
+const h3Style = {
+    color: "#FFFFFF",
+    padding: "20px"
 }
 
 const buttonStyle = {
     margin: "10px 0"
 }
 
-class SignUp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            email: "",
-            password: "",
-            username: "",
-            success: false,
-            login: false,
-        };
-        // must bind state updating functions to corresponding component in order to update states
-        this.handleChange = this.handleChange.bind(this);
-        this.redirectToLogIn = this.redirectToLogIn(this);
-    }
+const SignUp = () => {
+  const [state, setState] = useState({email: '', username: '', password: '', success: false, signup: false, uid: null})
 
-    handleChange(event) {
-        // update target state with value taken from event
-        this.setState({[event.target.name]: event.target.value});
-    }
+  const handleChange = (event) => {
+      setState((currState) => ({...currState, [event.target.name]: event.target.value}));
+  }
 
-    redirectToLogIn() {
-        this.setState({login: true})
-    }
+  const handleSubmit = (event) => {
+      authFunctions.signUp(
+          state.username,
+          state.email,
+          state.password
+      );
+      authFunctions.onUserActive((uid) => {
+          setState((currState) => ({...currState, success: true, uid: uid}));
+      });
+      event.preventDefault();
+  }
 
-    render() {
-        if (this.state.login) { // redirect to login page if logged in
-            return <Redirect to='./login'/>
-        }
-        return (
-            <div>
-                <AppBar position="static"> 
-                    <Toolbar>
-                        <h1>Veggie Patch</h1>
-                    </Toolbar>
-                </AppBar>
-                <Grid container style={gridStyle} spacing={1}>
-                    <Grid item xs={9}>
-                        <Paper style={leftPaperStyle}>
-                            <div>
-                                <h3 style={h3Style}>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras dui mauris, eleifend vitae gravida quis, volutpat eget urna. Maecenas sollicitudin, arcu et faucibus convallis, ligula orci consequat leo, id commodo elit ex vel dui. Etiam eleifend leo urna, nec facilisis lorem mollis in. Morbi eu auctor ligula, eget viverra nunc. Phasellus risus sapien, pretium ullamcorper libero sit amet, viverra consectetur sem. Integer sit amet porttitor lacus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nullam odio metus, pretium nec risus at, ornare tincidunt nisi. Ut viverra ipsum ac sollicitudin ullamcorper. Praesent sed est nisl.    
-                                </h3>
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Onion_on_White.JPG/1200px-Onion_on_White.JPG" alt="onion" width="100%" position="center"></img>
-                            </div>
-                        </Paper>
-                    </Grid>
-                    <Grid Item>
-                        <Paper style={rightPaperStyle} elevation={10}>
-                            <Grid align='center'>
-                                <Avatar></Avatar>
-                                <h2>Sign Up</h2>
-                            </Grid>
-                            <form>
-                                <TextField label="User name" placeholder="Username" name="username" id="username" required fullWidth autoFocus onChange={this.handleChange} value={this.state.username}/>
-                                <TextField label="Email" placeholder="email" name="email" id="email" required fullWidth onChange={this.handleChange} value={this.state.email}/>
-                                <TextField label="Password" placeholder="Password" name="password" id="password" required fullWidth type="password" onChange={this.handleChange} value={this.state.password}/>
-                                <Button type="submit" color="primary" variant="contained" fullWidth style={buttonStyle}>Sign up</Button>
-                            </form>
-                            <Typography>
-                                Already have an account?{"\n"}<Link href="">Log in</Link>
-                            </Typography>
-                        </Paper>
-                    </Grid>
-                </Grid>
-            </div>
-        )
-    };
+  const redirectToLogIn = () => {
+      setState((currState) => ({...currState, login: true}));
+  }
+
+  if (state.login) {
+      return <Redirect to='./login'/>
+  }
+  if (state.success) {
+      return <Redirect to="./home"/>
+  }
+  return (
+      <div>
+          <Grid container style={gridStyle} spacing={2}>
+              <Grid item>
+                  <Paper style={leftPaperStyle} elevation={10}>
+                      <Grid align='center'>
+                          <Avatar></Avatar>
+                          <h2>Sign up</h2>
+                      </Grid>
+                      <form onSubmit={handleSubmit}>
+                          <TextField label="Username" placeholder="Username" name="username" id="username" fullWidth required autoFocus onChange={handleChange} value={state.username}/>
+                          <TextField label="Email" placeholder="Enter email" name="email" id="email" fullWidth required onChange={handleChange} value={state.email}/>
+                          <TextField label="Password" placeholder="Enter password" name="password" id="password" fullWidth required type="password" onChange={handleChange} value={state.password}/>
+                          <Button type="submit" color="primary" variant="contained" fullWidth style={buttonStyle}>Sign up</Button>
+                      </form>
+                      <Typography>
+                          Already have an account?{" "}<Link href="" onClick={redirectToLogIn}>Log in</Link>
+                      </Typography>
+                  </Paper>
+              </Grid>
+              <Grid item>
+                  <Paper style={rightPaperStyle}>
+                      <div>
+                          <h3 style={h3Style}>
+                          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                          </h3>
+                          <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" alt="yellow flowers" width="60%"/>
+                      </div>
+                  </Paper>
+              </Grid>
+          </Grid>
+      </div>
+  )
+  
 }
 
 export default SignUp;
