@@ -6,6 +6,8 @@ import theme from "./theme";
 import LogIn from './pages/LogIn';
 import SignUp from './pages/SignUp';
 import CreateTask from './pages/CreateTask';
+import Summary from './pages/Summary';
+
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +17,7 @@ function App() {
             <Route path="/login" component={LogIn}/>
             <Route path="/signup" component={SignUp}/>
             <Route path="/createtask" component={CreateTask}/>
+            <Route exact path="/summary" component={Summary}/>
           </Switch>
       </MuiThemeProvider>
     </BrowserRouter>

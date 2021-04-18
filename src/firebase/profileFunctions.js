@@ -18,6 +18,9 @@ class ProfileFunctions extends Firebase {
         updates[uid + '/tasks' + task_key] = task;
         this.database.ref().update(updates)
     }
+    fetchTasks(uid) {
+        
+    }
 }
 
 const profileFunctions = new ProfileFunctions();

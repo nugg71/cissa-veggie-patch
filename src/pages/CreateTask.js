@@ -52,23 +52,32 @@ const buttonStyle = {
 }
 
 const CreateTask = () => {
-    const [signOut, setSignOut] = useState(false)
+    const [signOut, setSignOut] = useState()
     const classes = useStyles()
     const [submitted, setSubmitted] = useState(false)
     const [mainTask, setMainTask] = useState('')
     const [inputFields, setInputFields] = useState([
         { id: uuidv4(), task: '', timer: '' },
     ]);
+    
+    authFunctions.onUserActive(
+      (uid) => {
+        setSignOut(false);
+      },
+      () => {
+        setSignOut(true);
+      }
+    )
 
     const handleSubmit = (e) => {
         console.log("Main Task", mainTask);
         console.log("InputFields", inputFields);
         e.preventDefault();
-        setSubmitted(() => (true));
         var task = {task: mainTask, subtasks: inputFields};
         authFunctions.onUserActive(
           (uid) => {
             profileFunctions.updateTasks(uid, task);
+            setSubmitted(() => (true));
           },
           () => {
             setSignOut(true);
@@ -99,6 +108,10 @@ const CreateTask = () => {
         const values  = [...inputFields];
         values.splice(values.findIndex(value => value.id === id), 1);
         setInputFields(values);
+    }
+
+    if (signOut) {
+      return <Redirect to="./login"/>
     }
 
     if (submitted) {
