@@ -8,10 +8,10 @@ import AddIcon from '@material-ui/icons/Add';
 import Icon from '@material-ui/core/Icon';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  authFunctions
+  authFunctions, profileFunctions
 } from '../firebase';
-import Tasks from './Tasks'
-
+import Tasks from '../components/Tasks'
+import { Redirect } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -52,16 +52,33 @@ const buttonStyle = {
 }
 
 const CreateTask = () => {
-    const [mainTask, setMainTask] = useState({main: ''})
+    const [signOut, setSignOut] = useState(false)
     const classes = useStyles()
+    const [submitted, setSubmitted] = useState(false)
+    const [mainTask, setMainTask] = useState('')
     const [inputFields, setInputFields] = useState([
-        { id: uuidv4(), firstName: '', lastName: '' },
+        { id: uuidv4(), task: '', timer: '' },
     ]);
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+        console.log("Main Task", mainTask);
         console.log("InputFields", inputFields);
+        e.preventDefault();
+        setSubmitted(() => (true));
+        var task = {task: mainTask, subtasks: inputFields};
+        authFunctions.onUserActive(
+          (uid) => {
+            profileFunctions.updateTasks(uid, task);
+          },
+          () => {
+            setSignOut(true);
+          }
+        )
     };
+
+    const handleChangeMainTask = (event) => { 
+      setMainTask(() => (event.target.value));
+    }
 
     const handleChangeInput = (id, event) => {
         const newInputFields = inputFields.map(i => {
@@ -83,38 +100,38 @@ const CreateTask = () => {
         values.splice(values.findIndex(value => value.id === id), 1);
         setInputFields(values);
     }
-    
-    // const addSubTask = (event) => {
-    //     event.preventDefault();
-    //     setSubTasks([...tasks, input]);
-    //     setInput(''); // clear up input after click add task
-    // }
+
+    if (submitted) {
+      return <Redirect to="./submitted"/>
+    }
 
     return (
     <Container>
-      <h1>Add Main Task and SubTasks</h1>
+      <h1>Lets add a task!</h1>
       <form className={classes.root} onSubmit={handleSubmit}>
-        {/* <TextField
+        <TextField
             name="main"
-            label="Add main task"
+            label="Specify main task"
             variant="filled"
-            value={state.mainTask}
-            onChange={event => handleChangeInput(, event)}
-        /> */}
+            value={mainTask}
+            fullWidth
+            onChange={event => handleChangeMainTask(event)}
+        />
         { inputFields.map(inputField => (
           <div key={inputField.id}>
             <TextField
               name="task"
-              label="Add task"
+              label="Specify sub-task"
               variant="filled"
               value={inputField.task}
               onChange={event => handleChangeInput(inputField.id, event)}
             />
             <TextField
-              name="time"
+              name="timer"
               label="Time to complete"
               variant="filled"
               value={inputField.timer}
+              type="number"
               onChange={event => handleChangeInput(inputField.id, event)}
             />
             <IconButton disabled={inputFields.length === 1} onClick={() => handleRemoveFields(inputField.id)}>
@@ -132,9 +149,10 @@ const CreateTask = () => {
           variant="contained" 
           color="primary" 
           type="submit" 
-          endIcon={<Icon></Icon>}
+          // todo: add onion icon
+          endIcon={<Icon></Icon>} 
           onClick={handleSubmit}
-        >ADD</Button>
+        >ADD ONION</Button>
       </form>
       
     </Container>

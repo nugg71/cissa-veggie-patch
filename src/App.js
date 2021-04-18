@@ -14,7 +14,7 @@ function App() {
             <Route exact path="/" component={LogIn}/>
             <Route path="/login" component={LogIn}/>
             <Route path="/signup" component={SignUp}/>
-            <Route path="/todo" component={CreateTask}/>
+            <Route path="/createtask" component={CreateTask}/>
           </Switch>
       </MuiThemeProvider>
     </BrowserRouter>
