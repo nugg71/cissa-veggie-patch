@@ -31,6 +31,11 @@ class Firebase {
             .catch(this.debugError);
     }
 
+    updateDatabase(root, updates) {
+        this.database.ref().update(updates)
+            .catch(this.debugError);
+    }
+
     readDatabase(root, event, callback) {
         this.database.ref(root).on(event, callback);
     }

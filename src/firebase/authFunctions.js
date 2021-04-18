@@ -11,6 +11,7 @@ class AuthFunctions extends Firebase {
                     profile_pic: "https://media.discordapp.net/attachments/832189594137133056/832763543568515162/image2.png?width=946&height=946",
                     todo: {},
                     done: {},
+                    costumes: {},
                     last_login: new Date()
                 });
             })
